@@ -50,6 +50,7 @@ include_dependency(clang_tidy)
 include_dependency(catch)
 include_dependency(hippomocks)
 include_dependency(python)
+include_dependency(gnuefi)
 
 # ------------------------------------------------------------------------------
 # No Build Components

@@ -436,6 +436,13 @@ add_config(
     DESCRIPTION "Build unit test components"
 )
 
+add_config(
+    CONFIG_NAME ENABLE_BUILD_EFI
+    CONFIG_TYPE BOOL
+    DEFAULT_VAL ON
+    DESCRIPTION "Build efi boot-time loader components"
+)
+
 # ------------------------------------------------------------------------------
 # Binutils
 # ------------------------------------------------------------------------------
@@ -745,6 +752,21 @@ set(HIPPOMOCKS_URL_MD5 "6a0928dfee03fbf4c12c36219c696bae"
     CACHE INTERNAL FORCE
     "Hippomocks URL MD5 hash"
 )
+
+add_config(
+    CONFIG_NAME GNUEFI_URL
+    CONFIG_TYPE STRING
+    DEFAULT_VAL "https://github.com/vathpela/gnu-efi/archive/f99001c.zip"
+    DESCRIPTION "Gnu-efi URL"
+)
+
+add_config(
+    CONFIG_NAME GNUEFI_URL_MD5
+    CONFIG_TYPE STRING
+    DEFAULT_VAL "fe6c4de01d570f74a0813a42034ae79a"
+    DESCRIPTION "Gnu-efi URL MD5 hash"
+)
+
 
 # ------------------------------------------------------------------------------
 # BFM Configs

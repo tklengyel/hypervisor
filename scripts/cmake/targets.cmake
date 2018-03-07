@@ -110,6 +110,23 @@ if(NOT WIN32)
 endif()
 
 # ------------------------------------------------------------------------------
+# EFI
+# ------------------------------------------------------------------------------
+
+if(NOT WIN32 AND ENABLE_BUILD_EFI)
+
+    add_custom_target(efi_build
+        COMMAND ${SOURCE_UTIL_DIR}/efi_build.sh ${SOURCE_BFDRIVER_DIR} ${VMM_PREFIX_PATH}
+        USES_TERMINAL
+    )
+    add_custom_target_info(
+        TARGET efi_build
+        COMMENT "Build the Bareflank EFI boot-time loader"
+    )
+
+endif()
+
+# ------------------------------------------------------------------------------
 # BFM
 # ------------------------------------------------------------------------------
 

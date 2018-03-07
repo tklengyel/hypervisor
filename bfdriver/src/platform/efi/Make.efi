@@ -1,0 +1,37 @@
+
+GCCVERSION   := $(shell $(CC) -dumpversion | cut -f1 -d.)
+GCCMINOR     := $(shell $(CC) -dumpversion | cut -f2 -d.)
+USING_CLANG  := $(shell $(CC) -v 2>&1 | grep -q 'clang version' && echo clang)
+
+# Rely on GCC MS ABI support?
+GCCNEWENOUGH := $(shell ( [ $(GCCVERSION) -gt "4" ]           \
+                          || ( [ $(GCCVERSION) -eq "4" ]      \
+                               && [ $(GCCMINOR) -ge "7" ] ) ) \
+                        && echo 1)
+ifeq ($(GCCNEWENOUGH),1)
+  CFLAGS += -DGNU_EFI_USE_MS_ABI -maccumulate-outgoing-args --std=c11
+else ifeq ($(USING_CLANG),clang)
+  CFLAGS += -DGNU_EFI_USE_MS_ABI --std=c11
+endif
+
+# Only enable -fpic for non MinGW compilers (unneeded on MinGW)
+GCCMACHINE := $(shell $(CC) -dumpmachine)
+ifneq (mingw32,$(findstring mingw32, $(GCCMACHINE)))
+  CFLAGS += -fpic
+endif
+
+ifeq (FreeBSD, $(findstring FreeBSD, $(OS)))
+CFLAGS  += $(ARCH3264) -g -O2 -Wall -Wextra \
+           -fshort-wchar -fno-strict-aliasing \
+           -ffreestanding -fno-stack-protector
+else
+CFLAGS  += $(ARCH3264) -g -O2 -Wall -Wextra \
+           -fshort-wchar -fno-strict-aliasing \
+           -fno-merge-all-constants -ffreestanding -fno-stack-protector \
+           -fno-stack-check -U_FORTIFY_SOURCE
+endif
+
+ARFLAGS += -U
+ASFLAGS += $(ARCH3264)
+LDFLAGS	+= -nostdlib --warn-common --no-undefined --fatal-warnings 
+

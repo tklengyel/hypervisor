@@ -204,7 +204,7 @@ all()
     guest_load_debug_controls_verify_dr7();
     guest_ia32_sysenter_esp_canonical_address();
     guest_ia32_sysenter_eip_canonical_address();
-    guest_verify_load_ia32_perf_global_ctrl();
+    //guest_verify_load_ia32_perf_global_ctrl();
     guest_verify_load_ia32_pat();
     guest_verify_load_ia32_efer();
     guest_verify_load_ia32_bndcfgs();
@@ -235,7 +235,7 @@ all()
     host_cr3_for_unsupported_bits();
     host_ia32_sysenter_esp_canonical_address();
     host_ia32_sysenter_eip_canonical_address();
-    host_verify_load_ia32_perf_global_ctrl();
+    //host_verify_load_ia32_perf_global_ctrl();
     host_verify_load_ia32_pat();
     host_verify_load_ia32_efer();
 }

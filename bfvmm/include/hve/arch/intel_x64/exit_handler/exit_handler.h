@@ -222,6 +222,9 @@ public:
     exit_handler(const exit_handler &) = delete;
     exit_handler &operator=(const exit_handler &) = delete;
 
+    x64::idt* host_idt();
+    x64::tss* host_tss();
+
     /// @endcond
 };
 
