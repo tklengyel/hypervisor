@@ -45,8 +45,7 @@ $(TARGET).efi: $(TARGET).so
 $(TARGET).so: $(OBJS)
 	$(LD) $(LDFLAGS) $^ -o $@ $(LOADLIBES)
 
-$(OBJS): Makefile
-
+$(OBJS): Makefile modules
 
 %.o: %.S
 	$(CC) $(CPPFLAGS) $(CFLAGS) $< -c -o $@
@@ -54,7 +53,10 @@ $(OBJS): Makefile
 src/common.o: ../../common.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) $^ -c -o $@
 
+modules: /home/dev/code/hypervisor/buildex/prefixes/x86_64-vmm-elf/bin/eapis_vmm_static
+	./gen_modules.sh $^
+
 clean: 
 	rm -rf $(TARGET).efi $(TARGET).so src/*.o modules/*.o
 
-.PHONY: clean 
+.PHONY: clean modules

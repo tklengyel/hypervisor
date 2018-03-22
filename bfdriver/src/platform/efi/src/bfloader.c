@@ -40,8 +40,8 @@ EFI_STATUS efi_main(EFI_HANDLE image_in, EFI_SYSTEM_TABLE* st_in)
         goto fail;
     }
 
-    bf_start_by_interactive();
-    //bf_start_by_startupallaps();
+    //bf_start_by_interactive();
+    bf_start_by_startupallaps();
     //bf_start_by_switchbsp();
 
     Print(L"Booting next image in BootOrder.\n");

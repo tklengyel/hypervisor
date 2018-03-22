@@ -39,7 +39,7 @@ VOID bf_start_hypervisor_on_core(VOID *data)
 
     new_gdt = (PKGDTENTRY64)bf_allocate_runtime_zero_pool(newsize);
     if (new_gdt == NULL) {
-        Print(L"Error: bf_start_hypervisor_on_core: bf_allocate_runtime_zero_pool\n");
+        Print(L"Error: bf_start_hypervisor_on_core: bf_allocate_runtime_zero_pool1\n");
         return;
     }
 
@@ -47,7 +47,7 @@ VOID bf_start_hypervisor_on_core(VOID *data)
 
     tss = (PKTSS64)bf_allocate_runtime_zero_pool(sizeof(*tss) * 2);
     if (tss == NULL) {
-        Print(L"Error: bf_start_hypervisor_on_core: bf_allocate_runtime_zero_pool\n");
+        Print(L"Error: bf_start_hypervisor_on_core: bf_allocate_runtime_zero_pool2\n");
         return;
     }
 

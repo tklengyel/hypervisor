@@ -101,6 +101,7 @@ vmx::check_vmx_capabilities_msr()
 void
 vmx::check_ia32_vmx_cr0_fixed_msr()
 {
+    ::intel_x64::cr0::numeric_error::enable();
     auto cr0 = ::intel_x64::cr0::get();
     auto ia32_vmx_cr0_fixed0 = ::intel_x64::msrs::ia32_vmx_cr0_fixed0::get();
     auto ia32_vmx_cr0_fixed1 = ::intel_x64::msrs::ia32_vmx_cr0_fixed1::get();

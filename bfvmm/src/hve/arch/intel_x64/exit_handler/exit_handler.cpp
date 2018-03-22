@@ -121,8 +121,11 @@ emulate_rdmsr(::x64::msrs::field_type msr)
         case 0xCE:  // sandy bridge - MSR_PLATFORM_INFO
         case 0x140: // xeon phi - MISC_FEATURE_ENABLES
             return 0;
-            break;
 
+        // MSRs accessed by physical test box that throw GP in vmm
+        case 0x613:
+        case 0x619:
+            return 0;
 
         // QUIRK:
         //
@@ -221,10 +224,12 @@ handle_cpuid(gsl::not_null<bfvmm::intel_x64::vmcs *> vmcs)
     vmcs->save_state()->rdx = ret.rdx;
     if (leaf == 0x00000001)
     {
-        vmcs->save_state()->rcx = (ret.rcx)&(~(1UL<<27))&(~(1UL<<26));
+        vmcs->save_state()->rcx = (ret.rcx)&(~(1UL<<27))&(~(1UL<<26))&(~(1UL<<5));
+        vmcs->save_state()->rdx = (ret.rdx)&(~(1UL<<12));
     }
-    else if (leaf & 0x40000000)
+    else if (leaf & 0xC0000000)
     {
+        // bfdebug_info(0, "leaf & 0xC0000000");
         vmcs->save_state()->rax = 0;
         vmcs->save_state()->rcx = 0;
         vmcs->save_state()->rdx = 0;
@@ -305,19 +310,103 @@ handle_xsetbv(gsl::not_null<bfvmm::intel_x64::vmcs *> vmcs)
 static bool
 handle_hlt(gsl::not_null<bfvmm::intel_x64::vmcs *> vmcs)
 {
-    bferror_info(0, "in handle_hlt now ASDFGHJKL");
-    return advance(vmcs);
+    bferror_info(0, "in handle_hlt");
+    __asm("hlt");
+    ::intel_x64::vmcs::primary_processor_based_vm_execution_controls::hlt_exiting::disable();
+    return true;
 }
 
 static bool
 handle_vmx_preemption_timer_expired(gsl::not_null<bfvmm::intel_x64::vmcs *> vmcs)
 {
-    ::intel_x64::vmcs::guest_rip::dump(0);
-    ::intel_x64::vmcs::guest_activity_state::dump(0);
     bferror_info(0, "pulse");
 
     //::intel_x64::vmcs::debug::dump();
-    //return advance(vmcs);
+    return true;
+}
+
+static bool
+handle_init_signal(gsl::not_null<bfvmm::intel_x64::vmcs *> vmcs)
+{
+    ::intel_x64::vmcs::guest_activity_state::set(::intel_x64::vmcs::guest_activity_state::wait_for_sipi);
+    return true;
+}
+
+static bool
+handle_sipi(gsl::not_null<bfvmm::intel_x64::vmcs *> vmcs)
+{
+
+    ::intel_x64::vmcs::secondary_processor_based_vm_execution_controls::unrestricted_guest::enable_if_allowed(true);
+    
+    ::intel_x64::vmcs::guest_cr0::set(0x60000010);
+    ::intel_x64::vmcs::guest_cr3::set(0);
+    ::intel_x64::vmcs::guest_cr4::set(0);
+
+    ::intel_x64::cr2::set(0);
+    ::intel_x64::cr8::set(0);
+
+    auto vector_segment = ::intel_x64::vmcs::exit_qualification::sipi::vector::get() << 8;
+    ::intel_x64::vmcs::guest_cs_selector::set(vector_segment);
+    ::intel_x64::vmcs::guest_cs_base::set(vector_segment << 4);
+    ::intel_x64::vmcs::guest_cs_limit::set(0xFFFF);
+    ::intel_x64::vmcs::guest_cs_access_rights::set(0x9B);
+
+    ::intel_x64::vmcs::guest_ds_selector::set(0);
+    ::intel_x64::vmcs::guest_ds_base::set(0);
+    ::intel_x64::vmcs::guest_ds_limit::set(0xFFFF);
+    ::intel_x64::vmcs::guest_ds_access_rights::set(0x93);
+
+    ::intel_x64::vmcs::guest_es_selector::set(0);
+    ::intel_x64::vmcs::guest_es_base::set(0);
+    ::intel_x64::vmcs::guest_es_limit::set(0xFFFF);
+    ::intel_x64::vmcs::guest_es_access_rights::set(0x93);
+
+    ::intel_x64::vmcs::guest_fs_selector::set(0);
+    ::intel_x64::vmcs::guest_fs_base::set(0);
+    ::intel_x64::vmcs::guest_fs_limit::set(0xFFFF);
+    ::intel_x64::vmcs::guest_fs_access_rights::set(0x93);
+
+    ::intel_x64::vmcs::guest_gs_selector::set(0);
+    ::intel_x64::vmcs::guest_gs_base::set(0);
+    ::intel_x64::vmcs::guest_gs_limit::set(0xFFFF);
+    ::intel_x64::vmcs::guest_gs_access_rights::set(0x93);
+
+    ::intel_x64::vmcs::guest_ss_selector::set(0);
+    ::intel_x64::vmcs::guest_ss_base::set(0);
+    ::intel_x64::vmcs::guest_ss_limit::set(0xFFFF);
+    ::intel_x64::vmcs::guest_ss_access_rights::set(0x93);
+
+    ::intel_x64::vmcs::guest_tr_selector::set(0);
+    ::intel_x64::vmcs::guest_tr_base::set(0);
+    ::intel_x64::vmcs::guest_tr_limit::set(0xFFFF);
+    ::intel_x64::vmcs::guest_tr_access_rights::set(0x8B); //
+
+    ::intel_x64::vmcs::guest_ldtr_selector::set(0);
+    ::intel_x64::vmcs::guest_ldtr_base::set(0);
+    ::intel_x64::vmcs::guest_ldtr_limit::set(0xFFFF);
+    ::intel_x64::vmcs::guest_ldtr_access_rights::set(0x82); //
+
+    ::intel_x64::vmcs::guest_gdtr_base::set(0);
+    ::intel_x64::vmcs::guest_gdtr_limit::set(0xFFFF);
+
+    ::intel_x64::vmcs::guest_idtr_base::set(0);
+    ::intel_x64::vmcs::guest_idtr_limit::set(0xFFFF);
+
+    vmcs->save_state()->rax = 0;
+    vmcs->save_state()->rbx = 0;
+    vmcs->save_state()->rcx = 0;
+    vmcs->save_state()->rdx = 0;
+    vmcs->save_state()->rdi = 0;
+    vmcs->save_state()->rsi = 0;
+    vmcs->save_state()->rbp = 0;
+    vmcs->save_state()->rsp = 0;
+    vmcs->save_state()->rip = 0;
+    
+    ::intel_x64::vmcs::guest_rflags::set(0x2);
+    ::intel_x64::vmcs::guest_ia32_efer::set(0);
+
+    ::intel_x64::vmcs::guest_activity_state::set(::intel_x64::vmcs::guest_activity_state::active);
+
     return true;
 }
 
@@ -438,8 +527,23 @@ exit_handler::exit_handler(
     );
 
     add_handler(
+        exit_reason::basic_exit_reason::hlt,
+        handler_delegate_t::create<handle_hlt>()
+    );
+
+    add_handler(
         exit_reason::basic_exit_reason::vmx_preemption_timer_expired,
         handler_delegate_t::create<handle_vmx_preemption_timer_expired>()
+    );
+
+    add_handler(
+        exit_reason::basic_exit_reason::init_signal,
+        handler_delegate_t::create<handle_init_signal>()
+    );
+
+    add_handler(
+        exit_reason::basic_exit_reason::sipi,
+        handler_delegate_t::create<handle_sipi>()
     );
 }
 
@@ -595,6 +699,7 @@ exit_handler::write_control_state()
         ((ia32_vmx_procbased_ctls_msr >> 32) & 0x00000000FFFFFFFF)
     );
 
+
     vm_exit_controls::set(
         ((ia32_vmx_exit_ctls_msr >> 0) & 0x00000000FFFFFFFF) &
         ((ia32_vmx_exit_ctls_msr >> 32) & 0x00000000FFFFFFFF)
@@ -633,7 +738,12 @@ void
 exit_handler::handle(
     bfvmm::intel_x64::exit_handler *exit_handler) noexcept
 {
-    bferror_info(0, "VM Exit");
+    //bferror_info(0, "VM Exit");
+    //bferror_subtext(
+    //            0, "exit_reason",
+    //            ::intel_x64::vmcs::exit_reason::basic_exit_reason::description());
+    //::intel_x64::vmcs::guest_rip::dump(0);
+    //::intel_x64::vmcs::guest_activity_state::dump(0);
     guard_exceptions([&]() {
 
         const auto &handlers =
@@ -644,7 +754,7 @@ exit_handler::handle(
         for (const auto &d : handlers) {
             if (d(exit_handler->m_vmcs)) {
                 exit_handler->m_vmcs->resume();
-                bferror_info(0, "Resuming\n");
+                //bferror_info(0, "Resuming\n");
             }
         }
 

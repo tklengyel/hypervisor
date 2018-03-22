@@ -91,7 +91,7 @@ namespace debug
             vm_exit_msr_store_address::dump(level, msg);
             vm_exit_msr_load_address::dump(level, msg);
             vm_entry_msr_load_address::dump(level, msg);
-            executive_vmcs_pointer::dump(level, msg);
+            //executive_vmcs_pointer::dump(level, msg);
             tsc_offset::dump(level, msg);
             virtual_apic_address::dump(level, msg);
             apic_access_address::dump(level, msg);
@@ -195,7 +195,7 @@ namespace debug
             guest_tr_access_rights::dump(level, msg);
             guest_interruptibility_state::dump(level, msg);
             guest_activity_state::dump(level, msg);
-            guest_smbase::dump(level, msg);
+            //guest_smbase::dump(level, msg);
             guest_ia32_sysenter_cs::dump(level, msg);
             vmx_preemption_timer_value::dump(level, msg);
 
@@ -223,10 +223,10 @@ namespace debug
             bfdebug_brk3(level, msg);
 
             exit_qualification::dump(level, msg);
-            io_rcx::dump(level, msg);
-            io_rsi::dump(level, msg);
-            io_rdi::dump(level, msg);
-            io_rip::dump(level, msg);
+            //io_rcx::dump(level, msg);
+            //io_rsi::dump(level, msg);
+            //io_rdi::dump(level, msg);
+            //io_rip::dump(level, msg);
             guest_linear_address::dump(level, msg);
 
             bfdebug_lnbr(level, msg);
