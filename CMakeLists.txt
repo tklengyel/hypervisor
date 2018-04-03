@@ -50,7 +50,6 @@ include_dependency(clang_tidy)
 include_dependency(catch)
 include_dependency(hippomocks)
 include_dependency(python)
-include_dependency(gnuefi)
 
 # ------------------------------------------------------------------------------
 # No Build Components
@@ -146,6 +145,10 @@ if(ENABLE_BUILD_VMM)
         DEPENDS bfintrinsics
         SOURCE_DIR ${SOURCE_BFVMM_DIR}/src/main
     )
+endif()
+
+if (ENABLE_BUILD_EFI)
+    include_dependency(gnuefi)
 endif()
 
 # ------------------------------------------------------------------------------

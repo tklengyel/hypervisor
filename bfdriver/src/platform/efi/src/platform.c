@@ -261,8 +261,6 @@ int64_t platform_get_current_cpu_num(void)
                                  &ret);
   if (EFI_ERROR(status)) goto fail;
 
-  //Print(L"platform_get_current_cpu_num returning %x\n", ret);
-
   return ret;
 
 fail:

@@ -116,6 +116,7 @@ endif()
 if(NOT WIN32 AND ENABLE_BUILD_EFI)
 
     add_custom_target(efi_build
+        DEPENDS eapis_efi_${VMM_PREFIX}
         COMMAND ${SOURCE_UTIL_DIR}/efi_build.sh ${SOURCE_BFDRIVER_DIR} ${VMM_PREFIX_PATH}
         USES_TERMINAL
     )

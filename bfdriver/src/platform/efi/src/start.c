@@ -17,18 +17,20 @@ VOID bf_cpuid_on_core(VOID *data)
     __asm("cpuid");
 }
 
-
 VOID bf_start_hypervisor_on_core(VOID *data)
 {
-
+    //Print(L"start_hypervisor_on_core entered\n");
     (void)data;
 
     _writeeflags(_readeflags() & ~(1 << 18));
 
+    KDESCRIPTOR old_gdt;
+    _sgdt((void*)&old_gdt.Limit);
+    uint16_t old_tr = _str();
+
     PKGDTENTRY64 tss_entry, new_gdt;
     PKTSS64 tss;
     KDESCRIPTOR gdtr;
-
     _sgdt((void *)&gdtr.Limit);
     Print(L"gdtr.Base: %x gdtr.Limit: %x\n", gdtr.Base, gdtr.Limit);
 
@@ -66,24 +68,11 @@ VOID bf_start_hypervisor_on_core(VOID *data)
     tss_entry->Bits.Granularity = 0;
     tss_entry->MustBeZero = 0;
 
-    Print(L"Loading GDT\n");
-
+    //Print(L"Loading GDT\n");
     gdtr.Base = new_gdt;
     gdtr.Limit = KGDT64_SYS_TSS + sizeof(*tss_entry);
     _lgdt((void *)&gdtr.Limit);
-
-    //Print(L"GDT loaded\n");
-    //_sgdt((void*)&gdtr.Limit);
-    //Print(L"new gdtr.Base: %x  gdtr.Limit: %x\n", gdtr.Base, gdtr.Limit);
-
-    Print(L"Loading TR\n");
-
-    //uint16_t tester = _str();
-    //Print(L"tester: %x\n", tester);
     _ltr(KGDT64_SYS_TSS);
-
-    //tester = _str();
-    //Print(L"new tester: %x\n", tester);
 
     int64_t ret = common_start_core();
     if (ret < 0) {
@@ -91,13 +80,17 @@ VOID bf_start_hypervisor_on_core(VOID *data)
         return;
     }
 
+    // Load previous gdt/tr
+    _lgdt((void*)&old_gdt.Limit);
+    _str(old_tr);
+
+    bf_free_pool((void*)new_gdt);
+    bf_free_pool((void*)tss);
+
     Print(L"Core started.\n");
 
     //common_stop_core();
-
     //Print(L"Core stopped.\n");
-
-
     return;
 
 }
@@ -131,18 +124,6 @@ EFI_STATUS bf_start_by_startupallaps()
                                             NULL,
                                             NULL);
         CHERROR(status);
-
-        // status = g_mp_services->EnableDisableAP(g_mp_services,
-        //                                         1,
-        //                                         FALSE,
-        //                                         NULL);
-        // CHERROR(status);
-
-        // status = g_mp_services->EnableDisableAP(g_mp_services,
-        //                                         1,
-        //                                         TRUE,
-        //                                         NULL);
-        // CHERROR(status);
 
         console_get_keystroke(NULL);
 

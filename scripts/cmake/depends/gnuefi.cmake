@@ -27,21 +27,17 @@ if(ENABLE_BUILD_EFI AND NOT WIN32)
 
     add_dependency(
         gnuefi userspace
+        DEPENDS libcxx_${VMM_PREFIX}
         CONFIGURE_COMMAND   ${CMAKE_COMMAND} -E copy_directory ${CACHE_DIR}/gnuefi/ ${DEPENDS_DIR}/gnuefi/${USERSPACE_PREFIX}/build
+        COMMAND ${CMAKE_COMMAND} -E copy "${PREFIXES_DIR}/${VMM_PREFIX}/include/stdint.h" "${PREFIXES_DIR}/${USERSPACE_PREFIX}/include/stdint.h"
+        COMMAND ${CMAKE_COMMAND} -E copy "${PREFIXES_DIR}/${VMM_PREFIX}/include/c++/v1/stddef.h" "${PREFIXES_DIR}/${USERSPACE_PREFIX}/include/c++/v1/stddef.h"
+        COMMAND ${CMAKE_COMMAND} -E copy "${PREFIXES_DIR}/${VMM_PREFIX}/include/machine/_default_types.h" "${PREFIXES_DIR}/${USERSPACE_PREFIX}/include/"
         BUILD_COMMAND       make
         COMMAND             make -C lib
         COMMAND             make -C gnuefi
         INSTALL_COMMAND     make INSTALLROOT=${PREFIXES_DIR}/ PREFIX=${USERSPACE_PREFIX} install
         COMMAND             make INSTALLROOT=${PREFIXES_DIR}/ PREFIX=${USERSPACE_PREFIX} -C lib install
         COMMAND             make INSTALLROOT=${PREFIXES_DIR}/ PREFIX=${USERSPACE_PREFIX} -C gnuefi install
-    )
-
-    add_custom_command(
-        TARGET gnuefi_${USERSPACE_PREFIX} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy "${PREFIXES_DIR}/${VMM_PREFIX}/include/stdint.h" "${PREFIXES_DIR}/${USERSPACE_PREFIX}/include/stdint.h"
-        COMMAND ${CMAKE_COMMAND} -E copy "${PREFIXES_DIR}/${VMM_PREFIX}/include/c++/v1/stddef.h" "${PREFIXES_DIR}/${USERSPACE_PREFIX}/include/c++/v1/stddef.h"
-        COMMAND ${CMAKE_COMMAND} -E copy "${PREFIXES_DIR}/${VMM_PREFIX}/include/machine/_default_types.h" "${PREFIXES_DIR}/${USERSPACE_PREFIX}/include/machine/_default_types.h"
-        DEPENDS libcxx_${VMM_PREFIX}
     )
 
 endif()

@@ -7,9 +7,6 @@
 
 VOID bf_init_lib(EFI_HANDLE hnd, EFI_SYSTEM_TABLE* systab)
 {
-    //gST = systab;
-    //gBS = systab->BootServices;
-    //gRT = systab->RuntimeServices;
     InitializeLib(hnd, systab);
     this_image_h = hnd;
 }
@@ -51,7 +48,6 @@ BOOLEAN bf_match_device_paths(EFI_DEVICE_PATH* multi, EFI_DEVICE_PATH* single)
 {
     return LibMatchDevicePaths(multi, single);
 }
-
 
 VOID* bf_allocate_runtime_zero_pool(UINTN size)
 {

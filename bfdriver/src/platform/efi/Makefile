@@ -53,7 +53,7 @@ $(OBJS): Makefile modules
 src/common.o: ../../common.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) $^ -c -o $@
 
-modules: /home/dev/code/hypervisor/buildex/prefixes/x86_64-vmm-elf/bin/eapis_vmm_static
+modules: /home/dev/code/hypervisor/buildex/prefixes/x86_64-vmm-elf/bin/eapis_efi_static
 	./gen_modules.sh $^
 
 clean: 

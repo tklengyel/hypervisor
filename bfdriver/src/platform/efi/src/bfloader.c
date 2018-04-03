@@ -13,6 +13,7 @@ EFI_STATUS efi_main(EFI_HANDLE image_in, EFI_SYSTEM_TABLE* st_in)
 {   
 
     bf_init_lib(image_in, st_in);
+    //Print(L"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
     Print(L"=======================================\n");
     Print(L" ___                __ _           _   \n");
@@ -47,8 +48,8 @@ EFI_STATUS efi_main(EFI_HANDLE image_in, EFI_SYSTEM_TABLE* st_in)
     Print(L"Booting next image in BootOrder.\n");
     console_get_keystroke(NULL);
 
-    bf_boot_next_by_order();
-
+    // returning EFI_NOT_FOUND generally causes firmware to boot next 
+    // image in boot order without further prompting
     return EFI_NOT_FOUND;
 
 fail:

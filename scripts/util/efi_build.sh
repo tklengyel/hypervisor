@@ -23,7 +23,7 @@
 case $(uname -s) in
 Linux)
     #echo $1 $2
-    make VMM_PREFIX_PATH="$2" -C $1/src/platform/linux
+    make VMM_PREFIX_PATH="$2" -C $1/src/platform/efi/
     ;;
 *)
     >&2 echo "OS not supported"

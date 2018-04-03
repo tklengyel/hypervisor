@@ -40,7 +40,6 @@ EFI_STATUS bf_boot_next_by_order()
     VOID* order = NULL;
     UINTN size;
     order = bf_get_variable(L"BootOrder",&global_guid, &size);
-
     if (!order)
     {
         Print(L"Unable to fetch BootOrder variable.\n");
