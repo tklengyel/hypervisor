@@ -756,17 +756,30 @@ set(HIPPOMOCKS_URL_MD5 "6a0928dfee03fbf4c12c36219c696bae"
 add_config(
     CONFIG_NAME GNUEFI_URL
     CONFIG_TYPE STRING
-    DEFAULT_VAL "https://github.com/vathpela/gnu-efi/archive/f99001c.zip"
+    DEFAULT_VAL "https://github.com/tklengyel/gnu-efi/archive/3.0.6.zip"
     DESCRIPTION "Gnu-efi URL"
 )
 
 add_config(
     CONFIG_NAME GNUEFI_URL_MD5
     CONFIG_TYPE STRING
-    DEFAULT_VAL "fe6c4de01d570f74a0813a42034ae79a"
+    DEFAULT_VAL "083f8ac30c4be431e5124661b0156b72"
     DESCRIPTION "Gnu-efi URL MD5 hash"
 )
 
+add_config(
+    CONFIG_NAME ACPICA_URL
+    CONFIG_TYPE STRING
+    DEFAULT_VAL "https://github.com/acpica/acpica/archive/R03_13_18.zip"
+    DESCRIPTION "ACPICA URL"
+)
+
+add_config(
+    CONFIG_NAME ACPICA_URL_MD5
+    CONFIG_TYPE STRING
+    DEFAULT_VAL "51957832c11d3519cc46b8fedb214e3d"
+    DESCRIPTION "ACPICA URL MD5 hash"
+)
 
 # ------------------------------------------------------------------------------
 # BFM Configs

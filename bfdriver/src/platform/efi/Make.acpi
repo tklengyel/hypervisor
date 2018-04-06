@@ -1,0 +1,47 @@
+ACPICA ?= ../../../../../build/depends/acpica
+
+CFLAGS      += -Wno-unused-parameter
+CFLAGS      += -U__linux__ -U_LINUX
+CFLAGS      += -D_GNU_EFI
+CFLAGS      += -D_GNU_SOURCE
+CFLAGS      += -DACPI_MACHINE_WIDTH=64
+CFLAGS      += -DEFI_FUNCTION_WRAPPER
+CFLAGS      += -DACPI_APPLICATION
+CFLAGS      += -DACPI_SINGLE_THREADED
+CFLAGS      += -DUSE_NATIVE_ALLOCATE_ZEROED
+CFLAGS      += -fno-builtin -iwithprefix include
+CFLAGS      += -I$(ACPICA)/include
+CFLAGS      += -I$(ACPICA)/tools/acpidump
+
+LDFLAGS += \
+    -nostdinc\
+    -nostdlib\
+    -znocombreloc\
+    -Bsymbolic\
+    -shared\
+    -no-undefined
+
+ACPICA_FILES  = $(ACPICA)/tools/acpidump/apdump \
+                $(ACPICA)/tools/acpidump/apfiles \
+                $(ACPICA)/common/cmfsize \
+                $(ACPICA)/os_specific/efi/oseficlib \
+                $(ACPICA)/os_specific/efi/osefitbl \
+                $(ACPICA)/os_specific/efi/osefixf \
+                $(ACPICA)/components/tables/tbxfroot \
+                $(ACPICA)/components/tables/tbprint \
+                $(ACPICA)/components/utilities/utascii \
+                $(ACPICA)/components/utilities/utbuffer \
+                $(ACPICA)/components/utilities/utdebug \
+                $(ACPICA)/components/utilities/utclib \
+                $(ACPICA)/components/utilities/utexcep \
+                $(ACPICA)/components/utilities/utglobal \
+                $(ACPICA)/components/utilities/uthex \
+                $(ACPICA)/components/utilities/utmath \
+                $(ACPICA)/components/utilities/utnonansi \
+                $(ACPICA)/components/utilities/utprint \
+                $(ACPICA)/components/utilities/utstring \
+                $(ACPICA)/components/utilities/utstrsuppt \
+                $(ACPICA)/components/utilities/utstrtoul64 \
+                $(ACPICA)/components/utilities/utxferror
+
+ACPICA_OBJS  += $(foreach FILE,$(ACPICA_FILES),$(FILE).o)

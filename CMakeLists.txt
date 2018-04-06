@@ -149,6 +149,7 @@ endif()
 
 if (ENABLE_BUILD_EFI)
     include_dependency(gnuefi)
+    include_dependency(acpica)
 endif()
 
 # ------------------------------------------------------------------------------

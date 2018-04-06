@@ -3,7 +3,7 @@
 #include "bfloader.h"
 
 
-int printf ( const char * format, ... )
+int bf_printf ( const char * format, ... )
 {
 
     if (!format) return 0;

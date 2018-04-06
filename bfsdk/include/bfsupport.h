@@ -116,7 +116,8 @@ struct section_info_t {
  *      dummy member to avoid an empty struct on platforms not needing platform info
  */
 struct platform_info_t {
-    int _dummy;
+    /// Address of ACPI MADT, used only on UEFI platforms
+    uintptr_t acpi_madt;
 
 #if defined(BF_AARCH64)
     /// Address of serial peripheral within kernel space

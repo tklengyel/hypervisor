@@ -3,6 +3,7 @@
 
 #include "bfefi.h"
 #include "bfloader.h"
+#include "bfacpi.h"
 
 /**
  * Allocate Memory
@@ -276,10 +277,7 @@ void platform_restore_preemption(void)
 int64_t
 platform_populate_info(struct platform_info_t *info)
 {
-    if (info) {
-        platform_memset(info, 0, sizeof(struct platform_info_t));
-    }
-
+    info->acpi_madt = acpi_locate("MADT");
     return BF_SUCCESS;
 }
 

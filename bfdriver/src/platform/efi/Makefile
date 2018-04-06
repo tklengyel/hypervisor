@@ -1,9 +1,8 @@
-
-
 TOP			:= 	$(shell pwd)
 ARCH		:= 	$(shell uname -m)
 
 include Make.efi
+include Make.acpi
 
 SYSROOT		?= ../../../../../build/prefixes/x86_64-userspace-elf
 
@@ -19,8 +18,7 @@ CFLAGS  	+= -I$(TOP)/include \
 			   -I$(TOP)/../../../../bfsdk/include \
 			   -I$(TOP)/../../../../bfelf_loader/include \
 			   -I$(SYSROOT)/include/efi \
-			   -I$(SYSROOT)/include/efi/x86_64 
-
+			   -I$(SYSROOT)/include/efi/x86_64
 
 LDFLAGS		+= -shared -Bsymbolic -L$(LIBDIR)
 LDFLAGS		+= --defsym=EFI_SUBSYSTEM=0xa --no-undefined
@@ -29,12 +27,16 @@ LOADLIBES	+=  -T $(LDSCRIPT)
 
 FORMAT		:= -O binary --target=efi-app-$(ARCH)
 
-FILES		:= 	bfloader console boot platform common start x86_64 gnuefi/bflib
-OBJS		:=	$(foreach FILE,$(FILES),src/$(FILE).o)
-OBJS 		+=	$(foreach FILE,$(wildcard modules/*.c),$(FILE:.c=.o))
+BFLOADER_FILES  += 	bfloader console boot platform common start x86_64 acpi
+BFLOADER_FILES  +=  gnuefi/bflib
+FILES           +=  $(BFLOADER_FILES) $(ACPICA_FILES)
+OBJS		    +=	$(foreach FILE,$(BFLOADER_FILES),src/$(FILE).o)
+OBJS 		    +=	$(foreach FILE,$(wildcard modules/*.c),$(FILE:.c=.o))
+OBJS            +=  $(ACPICA_OBJS)
+
 TARGET 		:=	bfloader
 
-all: $(TARGET).efi 
+all: $(TARGET).efi
 
 $(TARGET).efi: $(TARGET).so
 	objcopy -j .text -j .sdata -j .data -j .dynamic -j .dynsym -j .rel \
@@ -53,10 +55,10 @@ $(OBJS): Makefile modules
 src/common.o: ../../common.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) $^ -c -o $@
 
-modules: /home/dev/code/hypervisor/buildex/prefixes/x86_64-vmm-elf/bin/eapis_efi_static
+modules: ../../../../../build/prefixes/x86_64-vmm-elf/bin/eapis_efi_static
 	./gen_modules.sh $^
 
-clean: 
-	rm -rf $(TARGET).efi $(TARGET).so src/*.o modules/*.o
+clean:
+	rm -rf $(TARGET).efi $(TARGET).so src/*.o modules/*.o src/gnuefi/*.o
 
 .PHONY: clean modules

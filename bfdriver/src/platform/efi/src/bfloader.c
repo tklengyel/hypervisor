@@ -1,8 +1,8 @@
-
 #include "bfefi.h"
 #include "bflib.h"
 #include "bfloader.h"
 #include "bfmodule.h"
+#include "bfacpi.h"
 #include "start.h"
 #include "common.h"
 
@@ -10,7 +10,7 @@ EFI_HANDLE this_image_h;
 EFI_MP_SERVICES_PROTOCOL* g_mp_services;
 
 EFI_STATUS efi_main(EFI_HANDLE image_in, EFI_SYSTEM_TABLE* st_in)
-{   
+{
 
     bf_init_lib(image_in, st_in);
     //Print(L"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
@@ -26,12 +26,13 @@ EFI_STATUS efi_main(EFI_HANDLE image_in, EFI_SYSTEM_TABLE* st_in)
     EFI_STATUS status;
 
     EFI_GUID gEfiMpServiceProtocolGuid = EFI_MP_SERVICES_PROTOCOL_GUID;
+
     status = gBS->LocateProtocol(&gEfiMpServiceProtocolGuid,
                                  NULL,
                                  (VOID **)&g_mp_services);
     CHERROR(status);
 
-    Print(L"Adding hypervisor modules..\n");
+    /*Print(L"Adding hypervisor modules..\n");
     add_hypervisor_modules();
 
     Print(L"Loading modules..\n");
@@ -44,13 +45,18 @@ EFI_STATUS efi_main(EFI_HANDLE image_in, EFI_SYSTEM_TABLE* st_in)
     //bf_start_by_interactive();
     bf_start_by_startupallaps();
     //bf_start_by_switchbsp();
+    */
 
-    Print(L"Booting next image in BootOrder.\n");
-    console_get_keystroke(NULL);
+    acpi_init(image_in, st_in);
+
+    bf_start(L"\\EFI\\debian\\grubx64.efi");
+
+    //Print(L"Booting next image in BootOrder.\n");
+    //console_get_keystroke(NULL);
 
     // returning EFI_NOT_FOUND generally causes firmware to boot next 
     // image in boot order without further prompting
-    return EFI_NOT_FOUND;
+    return EFI_SUCCESS;
 
 fail:
 
